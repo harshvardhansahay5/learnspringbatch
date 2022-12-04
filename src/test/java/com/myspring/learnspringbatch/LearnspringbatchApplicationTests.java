@@ -1,13 +1,17 @@
 package com.myspring.learnspringbatch;
 
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
+@RunWith(SpringRunner.class)
 class LearnSpringBatchApplicationTests {
 
 //	@Test
 //	void contextLoads() {
+//
 //	}
 
 }
