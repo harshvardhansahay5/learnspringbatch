@@ -1,6 +1,8 @@
 server:
   port: 8080
 spring:
+  application:
+    name: Learn Spring Batch
   datasource:
     url: jdbc:h2:file:./src/main/resources/db/learnspringbatch
     username: sa
