@@ -2,6 +2,8 @@ package com.myspring.learnspringbatch.controller;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -19,18 +21,26 @@ import java.util.Date;
 @RequestMapping("/batch")
 public class BatchTriggerController {
 
-    @Autowired
-    private JobLauncher jobLauncher;
+        @Autowired
+        private JobLauncher jobLauncher;
 
-    @Autowired
-    private Job job;
+        @Autowired
+        private Job job;
 
-    @GetMapping("/trigger")
-    @ResponseBody
-    @SneakyThrows
-    public Boolean triggerReadWriteBatchJob() {
-        jobLauncher.run(job, new JobParametersBuilder().addString("start at", new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date()) + "readWriteStep")
-                .toJobParameters());
-        return true;
-    }
+        @GetMapping("/trigger")
+        @ResponseBody
+        @SneakyThrows
+        public ExitStatus triggerReadWriteBatchJob() {
+                log.info("/batch/trigger hit");
+                return jobLauncher
+                                .run(job,
+                                                new JobParametersBuilder()
+                                                                .addString("start at",
+                                                                                new SimpleDateFormat(
+                                                                                                "EEE, d MMM yyyy HH:mm:ss Z")
+                                                                                                .format(new Date())
+                                                                                                + "readWriteStep")
+                                                                .toJobParameters())
+                                .getExitStatus();
+        }
 }

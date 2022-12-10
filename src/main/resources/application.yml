@@ -4,7 +4,7 @@ spring:
   application:
     name: Learn Spring Batch
   datasource:
-    url: jdbc:h2:file:./src/main/resources/db/learnspringbatch
+    url: jdbc:h2:file:C:/Users/harsh/code/db/learnspringbatch
     username: sa
     password: password
     driverClassName: org.h2.Driver

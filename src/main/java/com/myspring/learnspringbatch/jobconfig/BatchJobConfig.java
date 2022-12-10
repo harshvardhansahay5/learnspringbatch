@@ -33,7 +33,9 @@ public class BatchJobConfig {
     private final FileSystemResource inputResource;
     private final FileSystemResource outputResource;
 
-    public BatchJobConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory, @Value("src/main/resources/mock_data.csv") FileSystemResource inputResource, @Value("src/main/resources/mock_data.dat") FileSystemResource outputResource) {
+    public BatchJobConfig(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+            @Value("C:/Users/harsh/code/resources/mock_data.csv") FileSystemResource inputResource,
+            @Value("C:/Users/harsh/code/resources/mock_data.dat") FileSystemResource outputResource) {
         this.jobBuilderFactory = jobBuilderFactory;
         this.stepBuilderFactory = stepBuilderFactory;
         this.inputResource = inputResource;
@@ -42,14 +44,16 @@ public class BatchJobConfig {
 
     @Bean
     public Job readWriteJob() {
-        return jobBuilderFactory.get(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date()) + "readWriteJob")
+        return jobBuilderFactory
+                .get(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date()) + "readWriteJob")
                 .start(readWriteStep())
                 .build();
     }
 
     @Bean
     public Step readWriteStep() {
-        return stepBuilderFactory.get(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date()) + "readWriteStep")
+        return stepBuilderFactory
+                .get(new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z").format(new Date()) + "readWriteStep")
                 .<Customer, Customer>chunk(10)
                 .reader(customerItemReader())
                 .processor(customerItemProcessor())
@@ -92,7 +96,8 @@ public class BatchJobConfig {
         DelimitedLineAggregator<Customer> customerDelimitedLineAggregator = new DelimitedLineAggregator<>();
 
         BeanWrapperFieldExtractor<Customer> customerBeanWrapperFieldExtractor = new BeanWrapperFieldExtractor<>();
-        customerBeanWrapperFieldExtractor.setNames(new String[]{"id", "firstName", "lastName", "email", "gender", "ipAddress"});
+        customerBeanWrapperFieldExtractor
+                .setNames(new String[] { "id", "firstName", "lastName", "email", "gender", "ipAddress" });
 
         customerDelimitedLineAggregator.setDelimiter("|");
         customerDelimitedLineAggregator.setFieldExtractor(customerBeanWrapperFieldExtractor);
@@ -101,8 +106,10 @@ public class BatchJobConfig {
         customerFlatFileItemWriter.setAppendAllowed(false);
         customerFlatFileItemWriter.setShouldDeleteIfExists(true);
         customerFlatFileItemWriter.setLineAggregator(customerDelimitedLineAggregator);
-        customerFlatFileItemWriter.setHeaderCallback(headerWriter -> headerWriter.write("id|first_name|last_name" + "|email|gender|ip_address"));
-        customerFlatFileItemWriter.setFooterCallback(footerWriter -> footerWriter.write(new SimpleDateFormat("EEE, d " + "MMM yyyy HH:mm:ss Z").format(new Date())));
+        customerFlatFileItemWriter.setHeaderCallback(
+                headerWriter -> headerWriter.write("id|first_name|last_name" + "|email|gender|ip_address"));
+        customerFlatFileItemWriter.setFooterCallback(footerWriter -> footerWriter
+                .write(new SimpleDateFormat("EEE, d " + "MMM yyyy HH:mm:ss Z").format(new Date())));
         return customerFlatFileItemWriter;
     }
 }
