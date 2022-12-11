@@ -13,8 +13,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.api.gax.paging.Page;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -26,6 +35,7 @@ public class BatchTriggerController {
 
         @Autowired
         private Job job;
+        private final Storage storage = StorageOptions.getDefaultInstance().getService();;
 
         @GetMapping("/trigger")
         @ResponseBody
@@ -42,5 +52,54 @@ public class BatchTriggerController {
                                                                                                 + "readWriteStep")
                                                                 .toJobParameters())
                                 .getExitStatus();
+        }
+
+        @GetMapping("/getBlobNames")
+        @ResponseBody
+        @SneakyThrows
+        public List<String> getBlobNames() {
+                log.info("/batch/getBlobNames hit");
+                String bucket = "parent_directory";
+                List<String> listBlobNames = new ArrayList<>();
+                Page<Blob> blobs = storage.list(bucket,
+                                Storage.BlobListOption.prefix(
+                                                "sub_directory/" + new SimpleDateFormat("yyyyMMdd").format(new Date())
+                                                                + "/"),
+                                Storage.BlobListOption.currentDirectory());
+                for (Blob blob : blobs.iterateAll()) {
+                        log.info(blob.getName());
+                        listBlobNames.add(blob.getName());
+                }
+                Collections.sort(listBlobNames);
+                return listBlobNames;
+        }
+
+        @GetMapping("/getBlobs")
+        @ResponseBody
+        @SneakyThrows
+        public List<String> getBlobs() {
+                log.info("/batch/getBlobs hit");
+                String bucket = "parent_directory";
+                List<Blob> listBlob = new ArrayList<>();
+                List<String> listBlobNames = new ArrayList<>();
+                Page<Blob> blobs = storage.list(bucket,
+                                Storage.BlobListOption.prefix(
+                                                "sub_directory/" + new SimpleDateFormat("yyyyMMdd").format(new Date())
+                                                                + "/"),
+                                Storage.BlobListOption.currentDirectory());
+                for (Blob blob : blobs.iterateAll()) {
+                        log.info(blob.getName());
+                        listBlob.add(blob);
+                }
+                final class BlobComparator implements Comparator<Blob> {
+                        @Override
+                        public int compare(Blob blobA, Blob blobB) {
+                                return blobA.getName().compareToIgnoreCase(blobB.getName());
+                        }
+                }
+                // listBlob.sort(new BlobComparator());
+                Collections.shuffle(listBlob);
+                listBlob.stream().forEach(x->listBlobNames.add(x.getName()));
+                return listBlobNames;
         }
 }

@@ -27,3 +27,6 @@ spring:
       # initialize-schema: never
     job:
       enabled: false
+  jackson:
+    serialization:
+      indent_output: true
