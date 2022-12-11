@@ -20,7 +20,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
 public class MyWriter<T> extends FlatFileItemWriter<T> {
-    private final Storage storage = StorageOptions.getDefaultInstance().getService();;
+    private final Storage storage = StorageOptions.getDefaultInstance().getService();
     @Value("gs://parent_directory/sub_directory.dat")
     private Resource resource;
     private Blob blob;
